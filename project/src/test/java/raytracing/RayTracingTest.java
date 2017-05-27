@@ -76,7 +76,7 @@ public class RayTracingTest {
 		server.start();
 
 		System.out.println("TECHIO> open --port 8000 /index");
-
+		System.out.println("TECHIO> success");
 		renderer.render(c, bmp);
 	}
 
