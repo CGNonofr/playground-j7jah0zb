@@ -26,15 +26,15 @@ import renderers.destination.BmpRenderDestination;
 
 public class RayTracingTest {
 
-	private void test(URL url) throws IOException {
+	private void test(Vector cameraDirection, Vector cameraNormal, Vector translate, double distance, URL url) throws IOException {
 		int width = 400;
 		int height = 250;
 
 		final Object3D obj = new ObjFileLoader().load(url);
 		double cameraDistance = Math.max(Math.max(obj.getBoundingBox().getWidth(), obj.getBoundingBox().getHeight()),
-				obj.getBoundingBox().getDepth())/2;
-		final CenteredCamera c = new CenteredCamera(obj.getBoundingBox().center().translate(new Vector(40, 20, 15)),
-				cameraDistance, new Vector(-1, -1, -1).normalize(), new Vector(0, 1, 0).normalize(), 1, width / (double) height, 1,
+				obj.getBoundingBox().getDepth()) * distance;
+		final CenteredCamera c = new CenteredCamera(obj.getBoundingBox().center().translate(translate),
+				cameraDistance, cameraDirection, cameraNormal, 1, width / (double) height, 1,
 				new Dimension(width, height));
 		Scene sce = new Scene();
 		sce.addObject(obj);
@@ -80,14 +80,16 @@ public class RayTracingTest {
 		renderer.render(c, bmp);
 	}
 
-	// @Test
-	// public void testMiniCooper() throws IOException {
-	// test(RayTracingTest.class.getResource("/minicooper.obj"));
-	// }
+	@Test
+	public void testMiniCooper() throws IOException {
+		test(new Vector(1, 1, -1).normalize(), new Vector(0, 0, 1).normalize(), new Vector(20, -10, -25), 1,
+				RayTracingTest.class.getResource("/minicooper.obj"));
+	}
 
 	@Test
 	public void testTeapot() throws IOException {
-		test(RayTracingTest.class.getResource("/teapot.obj"));
+		test(new Vector(-1, -1, -1).normalize(), new Vector(0, 1, 0).normalize(), new Vector(40, 20, 15), 0.5,
+				RayTracingTest.class.getResource("/teapot.obj"));
 	}
 
 	@After
