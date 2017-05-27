@@ -27,16 +27,19 @@ import renderers.destination.BmpRenderDestination;
 public class RayTracingTest {
 
 	private void test(URL url) throws IOException {
+		int width = 500;
+		int height = 300;
+		
 		final Object3D obj = new ObjFileLoader().load(url);
 		double cameraDistance = Math.max(Math.max(obj.getBoundingBox().getWidth(), obj.getBoundingBox().getHeight()), obj.getBoundingBox().getDepth());
-		final CenteredCamera c = new CenteredCamera(obj.getBoundingBox().center().translate(new Vector(0, 0, -20)), cameraDistance, new Vector(1, 1, -1), new Vector(0, 0, 1).normalize(), 1, 1400d/900d, 1, new Dimension(1000, 700));
+		final CenteredCamera c = new CenteredCamera(obj.getBoundingBox().center().translate(new Vector(0, 0, -20)), cameraDistance, new Vector(1, 1, -1), new Vector(0, 0, 1).normalize(), 1, width / (double)height, 1, new Dimension(width, height));
 		Scene sce=new Scene();
 		sce.addObject(obj);
         AbstractRayTracingRenderer renderer = new RayTracingRenderer();
         renderer.prepare(sce);
         
         
-        final BmpRenderDestination bmp = new BmpRenderDestination(1000, 700);
+        final BmpRenderDestination bmp = new BmpRenderDestination(width, height);
 		
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 10);
         server.setExecutor(Executors.newCachedThreadPool());
