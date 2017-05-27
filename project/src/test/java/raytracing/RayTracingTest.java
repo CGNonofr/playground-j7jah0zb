@@ -27,14 +27,14 @@ import renderers.destination.BmpRenderDestination;
 public class RayTracingTest {
 
 	private void test(URL url) throws IOException {
-		int width = 500;
-		int height = 300;
+		int width = 400;
+		int height = 250;
 
 		final Object3D obj = new ObjFileLoader().load(url);
 		double cameraDistance = Math.max(Math.max(obj.getBoundingBox().getWidth(), obj.getBoundingBox().getHeight()),
-				obj.getBoundingBox().getDepth());
-		final CenteredCamera c = new CenteredCamera(obj.getBoundingBox().center().translate(new Vector(0, 0, -20)),
-				cameraDistance, new Vector(1, 1, -1), new Vector(0, 0, 1).normalize(), 1, width / (double) height, 1,
+				obj.getBoundingBox().getDepth())/2;
+		final CenteredCamera c = new CenteredCamera(obj.getBoundingBox().center().translate(new Vector(40, 20, 15)),
+				cameraDistance, new Vector(-1, -1, -1).normalize(), new Vector(0, 1, 0).normalize(), 1, width / (double) height, 1,
 				new Dimension(width, height));
 		Scene sce = new Scene();
 		sce.addObject(obj);

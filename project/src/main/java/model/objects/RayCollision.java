@@ -40,6 +40,9 @@ public class RayCollision {
 	public double getReflection() {
 		return reflection;
 	}
+	public void setReflection(double reflection) {
+		this.reflection = reflection;
+	}
 	public void setTextureCoordinates(TextureCoordinates textureCoordinates) {
 		this.textureCoordinates = textureCoordinates;
 	}
