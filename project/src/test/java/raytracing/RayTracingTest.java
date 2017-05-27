@@ -86,11 +86,11 @@ public class RayTracingTest {
 				RayTracingTest.class.getResource("/minicooper.obj"));
 	}
 
-//	@Test
-//	public void testTeapot() throws IOException {
-//		test(new Vector(-1, -1, -1).normalize(), new Vector(0, 1, 0).normalize(), new Vector(40, 20, 15), 0.5,
-//				RayTracingTest.class.getResource("/teapot.obj"));
-//	}
+	@Test
+	public void testTeapot() throws IOException {
+		test(new Vector(-1, -1, -1).normalize(), new Vector(0, 1, 0).normalize(), new Vector(40, 20, 15), 0.5,
+				RayTracingTest.class.getResource("/teapot.obj"));
+	}
 
 	@After
 	public void waitViewer() throws InterruptedException {
