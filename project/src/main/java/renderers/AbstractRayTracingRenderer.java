@@ -61,7 +61,7 @@ public abstract class AbstractRayTracingRenderer implements Renderer {
 			e.printStackTrace();
 		}
 		executor.shutdown();
-		System.out.println(System.currentTimeMillis() - start);
+		System.out.println("Rendering in " + (System.currentTimeMillis() - start)+"ms");
 	}
 	
 	public abstract Color throwRay(Ray ray, int depth);

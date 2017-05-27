@@ -124,6 +124,6 @@ public class Triangle implements Entity3D {
 		double angle=normal.angle(c.getDirection());
 		float cos=(float) Math.abs(Math.cos(angle));
 		g.setColor(new Color(cos, cos, cos));
-		((Graphics2D)g).fill(new Polygon(xs, ys, 3));
+		g.fill(new Polygon(xs, ys, 3));
 	}
 }
