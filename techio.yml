@@ -5,4 +5,4 @@ plan:
 projects:
   raytracing:
     root: /project
-    runner: codingame/java-maven3-junit4-runner
+    runner: techio/java-maven3-junit4-runner
