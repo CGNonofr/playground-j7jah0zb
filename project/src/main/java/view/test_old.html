@@ -1,0 +1,325 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script type='text/javascript' src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script type='text/javascript' src="http://files.codingame.com/codingame/pixi/pixi.js"></script>
+<script type='text/javascript' src="http://files.codingame.com/codingame/canvasengine/canvasengine.js"></script>
+<script type='text/javascript' src="lib/stats.min.js"></script>
+<script type='text/javascript' src="lib/whammy.js"></script>
+<link href='http://fonts.googleapis.com/css?family=Lato:300,400,900' rel='stylesheet' type='text/css'>
+
+<script type='text/javascript'>
+
+	DEFAULT_WIDTH=987;
+	DEFAULT_HEIGHT=544;
+	var Recorder=function(canvas, skipUnchanged, fps, quality) {
+		this.record=false;
+		this.video=null;
+		this.canvas=canvas;
+		this.frame=0;
+		this.skipUnchanged=skipUnchanged;
+		this.lastData=null;
+		this.fps=fps;
+		this.quality=quality;
+	}
+	
+	Recorder.prototype.save=function() {
+		if(this.video!=null) {
+			var data=this.canvas.toDataURL('image/webp', this.quality);
+			if(!this.skipUnchanged || data!=this.lastData) {
+				this.frame++;
+				this.video.add(data);
+				this.lastData=data;
+			}
+		}
+	}
+	
+	Recorder.prototype.startRecording=function() {
+		console.log("Début enregistrement");
+		this.frame=0;
+		this.video = new Whammy.Video(this.fps,this.quality);
+	}
+	
+	function errorHandler(e) {
+		  var msg = '';
+		  switch (e.name) {
+		    case 'QuotaExceededErr':
+		      msg = 'QUOTA_EXCEEDED_ERR';
+		      break;
+		    case 'NotFoundError':
+		      msg = 'NOT_FOUND_ERR';
+		      break;
+		    case 'SecurityErr':
+		      msg = 'SECURITY_ERR';
+		      break;
+		    case 'InvalidModificationErr':
+		      msg = 'INVALID_MODIFICATION_ERR';
+		      break;
+		    case 'InvalidStateErr':
+		      msg = 'INVALID_STATE_ERR';
+		      break;
+		    default:
+		      msg = 'Unknown Error';
+		      break;
+		  };
+
+		  console.log('Error: ' + msg);
+	}
+	
+	Recorder.prototype.stopRecording=function() {
+		if(this.video!=null) {
+			console.log("fin enregistrement");
+			if(this.frame>0) {
+				var output = this.video.compile();
+				window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
+				window.requestFileSystem(window.TEMPORARY, 500*1024*1024, function(fs){
+					fs.root.getFile('video.webm', {create: true}, function(fileEntry) {
+						fileEntry.createWriter(function(fileWriter) {
+							fileWriter.truncate(0);
+						    fileWriter.onwriteend = function(e) {
+						    	if (fileWriter.length === 0) fileWriter.write(output);
+						    	else {
+									var a=document.createElement("a");
+									a.href=fileEntry.toURL();
+									a.download="video.webm";
+									a.click();
+						    	}
+						    };
+						});
+
+					}, errorHandler);
+				}, 
+				errorHandler);
+				this.video=null;
+			} else {
+				alert("Aucune frame à enregistrer");	
+			}
+		}
+	}
+	
+	function resize(width, height) {
+		if(!width || !height) {
+			width=document.getElementById("canvasWidth").value;
+			height=document.getElementById("canvasHeight").value;
+		}
+		document.getElementById("canvasWidth").value=width;
+		document.getElementById("canvasHeight").value=height;
+		var ratio=Math.min(DEFAULT_WIDTH/width, DEFAULT_HEIGHT/height);
+		canvas.width=width;
+		canvas.height=height;
+		canvas.style.width=width+"px";
+		canvas.style.height=height+"px";
+		d1.init(Drawer.VERSION?canvas:canvas.getContext("2d"),width, height, 1/ratio);
+		canvas.style.width=(ratio*width)+"px";
+		canvas.style.height=(ratio*height)+"px";
+		if(frame >= 0 && timer==null) {
+			drawFrame(frame, 0, 0);
+		}
+	}
+	
+	function record(record) {
+		if(record) {
+			recorder=new Recorder(canvas, false, document.getElementById("recordFps").value, document.getElementById("recordQuality").value);
+			recorder.startRecording();
+		} else {
+			recorder.stopRecording();
+			recorder=null;
+		}
+	}
+
+
+	function go() {
+		document.getElementById("canvasWidth").value=DEFAULT_WIDTH;
+		document.getElementById("canvasHeight").value=DEFAULT_HEIGHT;
+		canvas = document.getElementsByTagName('canvas')[0];
+		d1 = new Drawer(Drawer.VERSION?canvas:canvas.getContext("2d"), DEFAULT_WIDTH, DEFAULT_HEIGHT);
+		resize();
+		
+		var stats = new Stats();
+		stats.setMode(2);
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.left = '0px';
+		stats.domElement.style.top = '0px';
+		document.getElementById("container").appendChild(stats.domElement);
+		d1.onBeforeRender=stats.begin;
+		d1.onAfterRender=stats.end;
+	}
+
+	function launchDraw() {
+		drawFrame(0, 1.0, 0);
+	}
+
+	var canvas;
+	var recorder;
+	var frame = -1;
+	var progress = 30;
+	var anim = 1;
+	var timer;
+	var fps = 10;
+	var duration = 500;
+	var direction = 1;
+	var shoot = 0;
+	var speed = 1;
+	var colors=['#ffae16', '#ff1d5c', '#22a1e4', '#de6ddf', '#9975e2', '#ff0000', '#6ac371', '#3ac5ca'];
+	
+	var data= [DATA]
+	;
+	var frames = data.views;
+
+	function drawFrame(id, progress, speed) {
+		document.getElementById("positionRange").value=id;
+		document.getElementById("framelabel").value=id;
+		frame=id;
+		updateText(id);
+		window.requestAnimationFrame(function() {
+			if(recorder) recorder.save();
+			d1.draw(frames[id], 0, canvas.width, canvas.heigth, colors, progress, frames, speed);
+		});
+	}
+
+	function updateText(id) {
+		document.getElementById("stdout").value = data.outputs["0"][id];
+		document.getElementById("console").value = "Round " + id + "/"+(frames.length-1)+"\n"+ data.outputs.referee[id];
+		if (data.errors["0"][id] != null) {
+			document.getElementById("errors").value=data.errors["0"][id];
+		} else {
+			document.getElementById("errors").value="";
+		}
+		if (data.errors.referee[id+1] != null) {
+			document.getElementById("refereeerrors").value =data.errors.referee[id+1];
+		} else {
+			document.getElementById("refereeerrors").value = "";
+		}
+	}
+
+	function animate() {
+		if (frame < 0)
+			frame0();
+		progress=1;
+		if (timer == null) {
+			timer = window.setInterval(function() {
+				var step=1/(fps/speed);
+				progress+=step;
+				if(progress>=0.9999 && progress<=1.00001) progress=1;
+				if (progress > 1) {
+					do{
+						frame++;
+					} while(frame < frames.length-1 && frames[frame].indexOf("KEY_FRAME") != 0);
+					progress=step;
+				}
+				if (frame < frames.length) {
+					drawFrame(frame, progress, fps / speed / 10);
+				} else {
+					--frame;
+					stop();
+				}
+			}, duration / fps);
+
+		}
+	}
+
+	function stop() {
+		if (frame >= 0 && timer != null) {
+			window.clearInterval(timer);
+			timer = null;
+			if(progress!=1) drawFrame(frame, progress=1.0, 0);
+		}
+	}
+
+	function frame0() {
+		document.getElementById("positionRange").max=frames.length-1;
+		document.getElementById("framelabel").max=frames.length-1;
+
+		stop();
+		frame = 0;
+		drawFrame(frame, 1.0, 0);
+	}
+
+	function nextFrame() {
+		stop();
+		if (frame < 0)
+			frame0();
+		else {
+			frame = Math.min(frame + 1, frames.length - 1);
+			drawFrame(frame, 1.0, 0);
+		}
+	}
+
+	function previousFrame() {
+		stop();
+		if (frame < 0)
+			frame0();
+		else {
+			frame = Math.max(frame - 1, 0);
+			drawFrame(frame, 1.0, 0);
+		}
+	};
+</script>
+<script type='text/javascript' src='viewer.js'></script>
+</head>
+<body style="left: 0px; top: 0px; margin: 0; padding: 0;">
+	<div style="left: 0px; top: 0px; margin: 0; padding: 0; width: 987px; height: 544px; display:table">
+		<div id="container" style="display:table-cell; vertical-align: middle; text-align: center">
+<!-- 		 <canvas width="400" height="300"></canvas> -->
+			<canvas
+			style="margin: 0; padding: 0; width: 987px; height: 544px; left: 0px; top: 0px; border: 1px solid black; line-height: 1px;"
+			width="987" height="544"></canvas>
+		</div>
+	</div>
+
+	<fieldset style="display: inline">
+		<legend>Sortie standard</legend>
+		<textarea id="stdout" style="width: 120px; height: 80px;" readonly></textarea>
+	</fieldset>
+	<fieldset style="display: inline">
+		<legend>Sortie d'erreur</legend>
+		<textarea id="errors" style="width: 300px; height: 80px;" readonly></textarea>
+	</fieldset>
+	<fieldset style="display: inline">
+		<legend>Sortie referee</legend>
+		<textarea id="console" style="width: 300px; height: 80px;" readonly></textarea>
+	</fieldset>
+	<fieldset style="display: inline">
+		<legend>Erreurs referee</legend>
+		<textarea id="refereeerrors" style="width: 120px; height: 80px;" readonly></textarea>
+	</fieldset>
+
+	<br />
+	<fieldset style="display: inline">
+		<legend>Position</legend>
+		<button onclick="frame0()">FRAME 0</button>
+		<button onclick="previousFrame()">&lt;</button>
+		<input id="positionRange" type="range" value="0" max="0" min="0" step="1" onchange="document.getElementById('framelabel').value=this.value|0; drawFrame(this.value|0, 1, 0);">
+		<input type="number" step="1" min="0" max="0" id="framelabel" value="0" style="width:30px" onchange="document.getElementById('positionRange').value=this.value|0; drawFrame(document.getElementById('positionRange').value |0,1,0);" />
+		<button onclick="nextFrame()">&gt;</button>
+	</fieldset>
+	
+	<fieldset style="display: inline">
+		<legend>Animations</legend>
+		<button onclick="animate()">animate</button>
+		<button onclick="stop()">stop</button>
+		
+		| speed : <input type="number" id="speedlabel" min="0.01" max="100" value="1" step="0.01" style="width:40px" onchange="speed=this.value;" />
+		<br /><button onclick="speed=document.getElementById('speedlabel').value=0.1;">x0.1</button>
+		<button onclick="speed=document.getElementById('speedlabel').value=0.2;">x0.2</button>
+		<button onclick="speed=document.getElementById('speedlabel').value=0.5;">x0.5</button>
+		<button onclick="speed=document.getElementById('speedlabel').value=1;">x1</button>
+		<button onclick="speed=document.getElementById('speedlabel').value=2;">x2</button>
+		<button onclick="speed=document.getElementById('speedlabel').value=5;">x5</button>
+		<button onclick="speed=document.getElementById('speedlabel').value=10;">x10</button>
+	</fieldset>
+	<fieldset style="display: inline">
+		<legend>Taille</legend>
+		Width : <input type="number" id="canvasWidth" min="480" max="4000" value="1920" step="1" style="width:50px" onChange="resize();" /><button onclick="resize(1920,1080);">FullHD</button>
+		<br />Height: <input type="number" id="canvasHeight" min="240" max="2000" value="1080" step="1" style="width:50px" onChange="resize();" /><button onclick="resize(DEFAULT_WIDTH,DEFAULT_HEIGHT);">Reset</button>
+	</fieldset>
+	<fieldset style="display: inline">
+		<legend>Enregistrement</legend>
+		fps : <input type="number" id="recordFps" min="5" max="200" value="60" step="1" style="width:50px" />
+		<input type="checkbox" name="record" onChange="record(this.checked);" /> Record<br />
+		Quality : <input type="number" id="recordQuality" min="0" max="1" value="1" step="0.01" style="width:50px" />
+	</fieldset>
+	<script>go();</script>
+</body>
+</html>

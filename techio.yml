@@ -1,6 +1,8 @@
-title : Content name
+title : Ray-tracing
 plan:
-  - title: Part 1
+  - title: Teapot
     statement: markdowns/part1.md
-  - title: Part 2
-    statement: markdowns/part2.md
+projects:
+  raytracing:
+    - root: /project
+    - runner: codingame/java-maven3-junit4-runner
