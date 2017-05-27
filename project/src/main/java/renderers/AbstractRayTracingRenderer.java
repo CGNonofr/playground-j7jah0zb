@@ -1,26 +1,18 @@
 package renderers;
 
 import java.awt.Color;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import model.Ray;
-import model.Vector;
 import model.camera.Camera;
-import model.objects.Entity3D;
-import model.objects.Object3D;
-import model.objects.RayCollision;
-import model.objects.Scene;
-import model.octree.OcTree;
 import renderers.destination.RenderDestination;
-import tools.MixColor;
 
 public abstract class AbstractRayTracingRenderer implements Renderer {
 
@@ -54,13 +46,15 @@ public abstract class AbstractRayTracingRenderer implements Renderer {
 		long start = System.currentTimeMillis();
 		ExecutorService executor = Executors.newWorkStealingPool();
 
-		List<Future<int[]>> results = new ArrayList<>();
+		
+		BlockingQueue<Future<int[]>> results = new LinkedBlockingQueue<>();
 		int height = c.getResolution().height;
 		for (int y = height - 1; y >= 0; --y) {
 			results.add(executor.submit(new RenderTask(c, y)));
 		}
 		try {
-			for (Future<int[]> result : results) {
+			Future<int[]> result;
+			while ((result = results.poll()) != null) {
 				render.writeLine(result.get());
 			}
 		} catch (IOException | ExecutionException | InterruptedException e) {

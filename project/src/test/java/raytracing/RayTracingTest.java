@@ -27,8 +27,8 @@ import renderers.destination.BmpRenderDestination;
 public class RayTracingTest {
 
 	private void test(URL url) throws IOException {
-		int width = 300;
-		int height = 200;
+		int width = 500;
+		int height = 300;
 
 		final Object3D obj = new ObjFileLoader().load(url);
 		double cameraDistance = Math.max(Math.max(obj.getBoundingBox().getWidth(), obj.getBoundingBox().getHeight()),
@@ -42,7 +42,6 @@ public class RayTracingTest {
 		renderer.prepare(sce);
 
 		final BmpRenderDestination bmp = new BmpRenderDestination(width, height);
-
 		HttpServer server = HttpServer.create(new InetSocketAddress(8000), 10);
 		server.setExecutor(Executors.newCachedThreadPool());
 		server.createContext("/index", new HttpHandler() {

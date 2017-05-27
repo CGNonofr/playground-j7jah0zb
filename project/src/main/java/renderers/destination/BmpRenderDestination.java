@@ -33,7 +33,8 @@ public class BmpRenderDestination implements RenderDestination {
 	}
 
 	public InputStream getInputStream() {
-		return inputStream.getInputStream(0);
+		return inputStream;
+//		return inputStream.getInputStream(0);
 	}
 	
 	public int getTotalSize() {
