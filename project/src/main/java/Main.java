@@ -65,6 +65,7 @@ public class Main {
 	            os.close();
 			}
 		});
+
         server.start();
 
         renderer.render(c, bmp);

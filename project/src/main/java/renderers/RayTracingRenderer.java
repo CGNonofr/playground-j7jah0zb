@@ -1,6 +1,5 @@
 package renderers;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 import model.Ray;
@@ -28,7 +27,7 @@ public class RayTracingRenderer extends AbstractRayTracingRenderer {
 	}
 
 	@Override
-	public Color throwRay(Ray ray, int depth) {
+	public Integer throwRay(Ray ray, int depth) {
 		if (depth < 0)
 			return null;
 		RayCollision collision = null;
@@ -50,19 +49,19 @@ public class RayTracingRenderer extends AbstractRayTracingRenderer {
 			}
 		}
 		if (collision != null) {
-			Color col = null;
+			Integer col = null;
 			if (texture != null && collision.getTextureCoordinates() != null) {
 				col = collision.getTextureCoordinates().getFrom(texture);
 			} else {
 				double angle = collision.getNormal().angle(ray.getDirection());
-				float cos = (float) Math.abs(Math.cos(angle));
-				col = new Color(cos, cos, cos);
+				int cos = (int) (Math.abs(Math.cos(angle)) * 255);
+				col = (cos<<16) + (cos << 8) + cos;
 			}
 
 			if (collision.getTransparence() > 0) {
 				Ray newRay = new Ray(collision.getPoint().translate(
 						ray.getDirection().mult(0.0001)), ray.getDirection());
-				Color c = throwRay(newRay, depth - 1);
+				Integer c = throwRay(newRay, depth - 1);
 				if (c != null) {
 					col = MixColor.mixColor(col, c,
 							1 - collision.getTransparence());
@@ -73,7 +72,7 @@ public class RayTracingRenderer extends AbstractRayTracingRenderer {
 						ray.getDirection());
 				Ray newRay = new Ray(collision.getPoint().translate(
 						newDir.mult(0.0001)), newDir);
-				Color c = throwRay(newRay, depth - 1);
+				Integer c = throwRay(newRay, depth - 1);
 				if (c != null) {
 					col = MixColor.mixColor(col, c,
 							1 - collision.getReflection());
@@ -81,7 +80,7 @@ public class RayTracingRenderer extends AbstractRayTracingRenderer {
 			}
 			return col;
 		} else {
-			return new Color(220, 220, 255);
+			return (220<<16) + (220 << 8) + 255;
 		}
 	}
 

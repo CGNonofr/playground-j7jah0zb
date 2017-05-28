@@ -1,0 +1,26 @@
+<html>
+	<head>
+		<style>
+			body {
+				background-image: url(/imagejpg);
+				background-position: center;
+				background-size: contain;
+				background-repeat:no-repeat;
+			}
+		</style>
+	</head>
+	<body>
+		<script>
+			setInterval(function() {
+				var image = '/imagejpg?random='+Math.random();
+				var i = document.createElement('img');
+				i.onload = function() {
+					document.getElementsByTagName('body')[0].style['background-image'] = 'url('+image+')';
+				};
+				i.src = image;
+			}, 2000);
+			
+		</script>
+	
+	</body>
+</html>

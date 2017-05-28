@@ -1,10 +1,11 @@
 package renderers.destination;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-
+import java.util.Arrays;
 
 import org.jmrtd.io.SplittableInputStream;
 
@@ -16,12 +17,19 @@ public class BmpRenderDestination implements RenderDestination {
 	private final SplittableInputStream inputStream;
 	private int width, height;
 	private int lineCounter = 0;
+	private byte[] availableData;
+	private int availableDataPos;
 	public BmpRenderDestination(int width, int height) throws IOException {
 		this.width = width;
 		this.height = height;
+		availableDataPos = 0;
+		availableData = new byte[getTotalSize()];
+		Arrays.fill(availableData, (byte) 0xff);
 		
-		inputStream = new SplittableInputStream(new PipedInputStream(outputStream = new PipedOutputStream()), getTotalSize());
+		inputStream = new SplittableInputStream(new PipedInputStream(outputStream = new PipedOutputStream(), getTotalSize()), getTotalSize());
 		generateHeader();
+		
+
 	}
 	
 	public int getWidth() {
@@ -33,16 +41,20 @@ public class BmpRenderDestination implements RenderDestination {
 	}
 
 	public InputStream getInputStream() {
-		return inputStream;
-//		return inputStream.getInputStream(0);
+		return inputStream.getInputStream(0);
+	}
+	
+	public InputStream getFilledInputStream() throws IOException {
+		return new ByteArrayInputStream(availableData);
 	}
 	
 	public int getTotalSize() {
-		return 54 + 3 * width * height + getPadding(width)*height;
+		return 54 + 3 * (width + getPadding(width)) * height;
 	}
 
 	private void generateHeader() throws IOException {
-		byte bytes[] = new byte[54];
+		byte bytes[] = availableData;
+		Arrays.fill(bytes, 0, 54, (byte) 0x00);
 		byte[]a=intToByteCouple(BMP_CODE);
 		bytes[0]=a[1];
 		bytes[1]=a[0];
@@ -74,17 +86,17 @@ public class BmpRenderDestination implements RenderDestination {
 		
 		bytes[28]=24;
 		
-		outputStream.write(bytes);
+		outputStream.write(bytes, 0, availableDataPos = 54);
 	}
 	
 	public void writeLine(int[] rgbValues) throws IOException {
 		for(int rgb : rgbValues){
-			outputStream.write((byte) rgb);
-			outputStream.write((byte) (rgb>>8));
-			outputStream.write((byte) (rgb>>16));
+			outputStream.write(availableData[availableDataPos++] = (byte) rgb);
+			outputStream.write(availableData[availableDataPos++] = (byte) (rgb>>8));
+			outputStream.write(availableData[availableDataPos++] = (byte) (rgb>>16));
 		}
 		for(int j=getPadding(width);j>0;j--) {
-			outputStream.write(0);
+			outputStream.write(availableData[availableDataPos++] = 0);
 		}
 		lineCounter++;
 	}

@@ -1,12 +1,18 @@
 package raytracing;
 
 import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.Executors;
+
+import javax.imageio.ImageIO;
 
 import org.junit.After;
 import org.junit.Test;
@@ -26,9 +32,10 @@ import renderers.destination.BmpRenderDestination;
 
 public class RayTracingTest {
 
-	private void test(Vector cameraDirection, Vector cameraNormal, Vector translate, double distance, URL url) throws IOException {
-		int width = 400;
-		int height = 250;
+	@SuppressWarnings("restriction")
+	private void test(Dimension resolution, Vector cameraDirection, Vector cameraNormal, Vector translate, double distance, URL url) throws IOException {
+		int width = resolution.width;
+		int height = resolution.height;
 
 		final Object3D obj = new ObjFileLoader().load(url);
 		double cameraDistance = Math.max(Math.max(obj.getBoundingBox().getWidth(), obj.getBoundingBox().getHeight()),
@@ -47,11 +54,17 @@ public class RayTracingTest {
 		server.createContext("/index", new HttpHandler() {
 			@Override
 			public void handle(HttpExchange ex) throws IOException {
-				String answer = "<html><body style=\"background-image: url(/image); background-position: center; background-size: contain; background-repeat: no-repeat;\"></body></html>";
-				ex.sendResponseHeaders(200, answer.length());
-				OutputStream os = ex.getResponseBody();
-				os.write(answer.getBytes());
-				os.close();
+				try {
+					String answer = new String(Files.readAllBytes(Paths.get(RayTracingTest.class.getResource("/index.html").toURI())));
+
+					ex.sendResponseHeaders(200, answer.length());
+					OutputStream os = ex.getResponseBody();
+					os.write(answer.getBytes());
+					os.close();
+				} catch (URISyntaxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		server.createContext("/image", new HttpHandler() {
@@ -62,9 +75,9 @@ public class RayTracingTest {
 				ex.sendResponseHeaders(200, 0);
 				OutputStream os = ex.getResponseBody();
 
-				InputStream stream = bmp.getInputStream();
+				
 				int data;
-				try {
+				try (InputStream stream = bmp.getInputStream()) {
 					while ((data = stream.read()) >= 0) {
 						os.write(data);
 					}
@@ -73,24 +86,42 @@ public class RayTracingTest {
 				os.close();
 			}
 		});
-		server.start();
+		server.createContext("/imagejpg", new HttpHandler() {
+			@Override
+			public void handle(HttpExchange ex) throws IOException {
+				ex.getResponseHeaders().set("Content-Disposition", "inline; filename=\"render.jpg\"");
+				ex.getResponseHeaders().set("Content-Type", "image/jpg");
+				ex.sendResponseHeaders(200, 0);
+				OutputStream os = ex.getResponseBody();
 
+				try (InputStream stream = bmp.getFilledInputStream()) {
+					BufferedImage image = ImageIO.read(stream);
+					ImageIO.write(image, "jpg", os);
+				}
+				os.close();
+			}
+		});
+		server.start();
 		System.out.println("TECHIO> open --port 8000 /index");
 		System.out.println("TECHIO> success");
 		renderer.render(c, bmp);
+		
+		System.out.println("gc");
+		System.gc();
+		System.out.println("end gc");
 	}
 
 	@Test
 	public void testMiniCooper() throws IOException {
-		test(new Vector(1, 1, -1).normalize(), new Vector(0, 0, 1).normalize(), new Vector(20, -10, -25), 1,
+		test(new Dimension(700, 400), new Vector(1, 1, -1).normalize(), new Vector(0, 0, 1).normalize(), new Vector(20, -10, -25), 1,
 				RayTracingTest.class.getResource("/minicooper.obj"));
 	}
-
-	@Test
-	public void testTeapot() throws IOException {
-		test(new Vector(-1, -1, -1).normalize(), new Vector(0, 1, 0).normalize(), new Vector(40, 20, 15), 0.5,
-				RayTracingTest.class.getResource("/teapot.obj"));
-	}
+//
+//	@Test
+//	public void testTeapot() throws IOException {
+//		test(new Dimension(1920, 1080), new Vector(-1, -1, -1).normalize(), new Vector(0, 1, 0).normalize(), new Vector(40, 20, 15), 0.5,
+//				RayTracingTest.class.getResource("/teapot.obj"));
+//	}
 
 	@After
 	public void waitViewer() throws InterruptedException {

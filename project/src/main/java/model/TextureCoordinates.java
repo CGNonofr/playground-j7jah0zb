@@ -1,6 +1,5 @@
 package model;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 public class TextureCoordinates {
@@ -16,9 +15,9 @@ public class TextureCoordinates {
 	public double getY() {
 		return y;
 	}
-	public Color getFrom(BufferedImage texture) {
+	public int getFrom(BufferedImage texture) {
 		int x=Math.max(0, Math.min(texture.getWidth()-1, (int)Math.round(this.x*texture.getWidth())));
 		int y=Math.max(0, Math.min(texture.getHeight()-1, (int)Math.round(this.y*texture.getWidth())));
-		return new Color(texture.getRGB(x, y));
+		return texture.getRGB(x, y);
 	}
 }

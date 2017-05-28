@@ -1,6 +1,5 @@
 package renderers;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
@@ -21,9 +20,9 @@ public abstract class AbstractRayTracingRenderer implements Renderer {
 		int[] colors = new int[width];
 		for (int x = 0; x < width; ++x) {
 			Ray ray = c.getRay(x, line);
-			Color col = throwRay(ray, 5);
-			colors[x] = col.getRGB() & 0xffffff;
+			colors[x] = throwRay(ray, 5);
 		}
+		System.gc();
 		return colors;
 	}
 
@@ -64,5 +63,5 @@ public abstract class AbstractRayTracingRenderer implements Renderer {
 		System.out.println("Rendering in " + (System.currentTimeMillis() - start)+"ms");
 	}
 	
-	public abstract Color throwRay(Ray ray, int depth);
+	public abstract Integer throwRay(Ray ray, int depth);
 }
