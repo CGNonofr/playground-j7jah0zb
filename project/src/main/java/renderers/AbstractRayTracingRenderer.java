@@ -56,10 +56,10 @@ public abstract class AbstractRayTracingRenderer implements Renderer {
 			int counter = 0;
 			while ((result = results.poll()) != null) {
 				render.writeLine(result.get());
-				counter ++;
 				if (counter % 50 == 0) {
 					System.out.println(counter + " line computed");
 				}
+				counter ++;
 			}
 		} catch (IOException | ExecutionException | InterruptedException e) {
 			e.printStackTrace();
