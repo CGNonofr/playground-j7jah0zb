@@ -116,12 +116,12 @@ public class RayTracingTest {
 		test(new Dimension(700, 400), new Vector(1, 1, -1).normalize(), new Vector(0, 0, 1).normalize(), new Vector(20, -10, -25), 1,
 				RayTracingTest.class.getResource("/minicooper.obj"));
 	}
-//
-//	@Test
-//	public void testTeapot() throws IOException {
-//		test(new Dimension(1920, 1080), new Vector(-1, -1, -1).normalize(), new Vector(0, 1, 0).normalize(), new Vector(40, 20, 15), 0.5,
-//				RayTracingTest.class.getResource("/teapot.obj"));
-//	}
+
+	@Test
+	public void testTeapot() throws IOException {
+		test(new Dimension(1920, 1080), new Vector(-1, -1, -1).normalize(), new Vector(0, 1, 0).normalize(), new Vector(40, 20, 15), 0.5,
+				RayTracingTest.class.getResource("/teapot.obj"));
+	}
 
 	@After
 	public void waitViewer() throws InterruptedException {
