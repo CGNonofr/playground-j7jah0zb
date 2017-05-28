@@ -43,7 +43,7 @@ public abstract class AbstractRayTracingRenderer implements Renderer {
 	@Override
 	public void render(final Camera c, RenderDestination render) {
 		long start = System.currentTimeMillis();
-		ExecutorService executor = Executors.newWorkStealingPool();
+		ExecutorService executor = Executors.newWorkStealingPool(1);
 
 		
 		BlockingQueue<Future<int[]>> results = new LinkedBlockingQueue<>();
