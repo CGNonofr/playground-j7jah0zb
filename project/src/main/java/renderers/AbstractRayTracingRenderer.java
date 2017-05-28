@@ -53,8 +53,13 @@ public abstract class AbstractRayTracingRenderer implements Renderer {
 		}
 		try {
 			Future<int[]> result;
+			int counter = 0;
 			while ((result = results.poll()) != null) {
 				render.writeLine(result.get());
+				counter ++;
+				if (counter % 50 == 0) {
+					System.out.println(counter + " line computed");
+				}
 			}
 		} catch (IOException | ExecutionException | InterruptedException e) {
 			e.printStackTrace();
