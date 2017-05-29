@@ -70,6 +70,7 @@ public class ObjFileLoader implements ObjLoader {
 					faces.add(new Face(fvertex.toArray(new Vertex[fvertex.size()])));
 				}
 			}
+			System.out.println(faces.size());
 			return new Object3D(faces.toArray(new Face[faces.size()]));
 		}
 	}

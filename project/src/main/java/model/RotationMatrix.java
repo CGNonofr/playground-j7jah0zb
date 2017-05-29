@@ -7,7 +7,7 @@ public class RotationMatrix {
 	}
 	
 	public static RotationMatrix fromAxisAngle(Vector axis, double ang) {
-		axis=axis.normalize();
+		axis = axis.clone().normalize();
 		double cos=Math.cos(ang);
 		double sin=Math.sin(ang);
 		return new RotationMatrix(new double[][] {
@@ -17,7 +17,12 @@ public class RotationMatrix {
 		});
 	}
 	
-	public Vector apply(Vector v) {
-		return new Vector(v.getX()*matrix[0][0]+v.getY()*matrix[0][1]+v.getZ()*matrix[0][2],v.getX()*matrix[1][0]+v.getY()*matrix[1][1]+v.getZ()*matrix[1][2],v.getX()*matrix[2][0]+v.getY()*matrix[2][1]+v.getZ()*matrix[2][2]);
+	public void apply(Vector v) {
+		double x = v.getX()*matrix[0][0]+v.getY()*matrix[0][1]+v.getZ()*matrix[0][2];
+		double y = v.getX()*matrix[1][0]+v.getY()*matrix[1][1]+v.getZ()*matrix[1][2];
+		double z = v.getX()*matrix[2][0]+v.getY()*matrix[2][1]+v.getZ()*matrix[2][2];
+		v.setX(x);
+		v.setY(y);
+		v.setZ(z);
 	}
 }

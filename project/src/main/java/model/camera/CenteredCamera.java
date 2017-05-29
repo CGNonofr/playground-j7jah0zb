@@ -17,7 +17,7 @@ public class CenteredCamera extends Camera {
 	public CenteredCamera(Point3D sceneCenter, double distance, Vector direction, Vector normal, double screenDistance, double screenWidth, double screenHeight, Dimension resolution) {
 		super(screenDistance, screenWidth, screenHeight, resolution);
 		this.sceneCenter = sceneCenter;
-		this.direction=direction.normalize();
+		this.direction = direction.clone().normalize();
 		this.distance = distance;
 		this.normal=normal;
 		
@@ -31,36 +31,36 @@ public class CenteredCamera extends Camera {
 
 	@Override
 	public Point3D getPosition() {
-		return sceneCenter.translate(direction.mult(-distance));
+		return sceneCenter.clone().translate(direction.clone().mult(-distance));
 	}
 
 
 	public void rotateY(double angle) {
-		this.direction=this.direction.rotate(normal, angle);
+		this.direction.rotate(normal, angle);
 		super.update();
 	}
 	public void rotateX(double angle) {
-		Vector newDirection=this.direction.rotate(normal.cross(direction), angle);
-		this.normal=this.normal.rotate(normal.cross(direction), angle);
-		this.direction=newDirection;
+		Vector newDirection=this.direction.clone().rotate(normal.clone().cross(direction), angle);
+		this.normal.rotate(normal.clone().cross(direction), angle);
+		this.direction = newDirection;
 		super.update();
 	}
 	
 	public void rotateZ(double angle) {
-		this.normal=this.normal.rotate(direction, angle);
+		this.normal.rotate(direction, angle);
 		super.update();
 	}
 	
 	public void rotateXZ(double angle) {
-		this.direction=this.direction.rotateXZ(angle).normalize();
+		this.direction.rotateXZ(angle).normalize();
 		super.update();
 	}
 	
 	public Vector screenH() {
-		return getDirection().cross(normal).normalize();
+		return getDirection().clone().cross(normal).normalize();
 	}
 	public Vector screenV() {
-		return getDirection().cross(screenH()).normalize();
+		return getDirection().clone().cross(screenH()).normalize();
 	}
 
 

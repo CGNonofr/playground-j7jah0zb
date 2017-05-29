@@ -20,8 +20,7 @@ public class Face implements Entity3D {
 	public Face(Vertex... vertexes) {
 		this.vertexes = vertexes;
 		normal = new Vector(vertexes[0].getPoint(), vertexes[1].getPoint())
-				.cross(new Vector(vertexes[0].getPoint(), vertexes[2]
-						.getPoint()));
+				.cross(new Vector(vertexes[0].getPoint(), vertexes[2].getPoint()));
 		decomposition = decompose();
 	}
 
@@ -103,8 +102,7 @@ public class Face implements Entity3D {
 			minz = Math.min(minz, vcenter.getZ());
 			maxz = Math.max(maxz, vcenter.getZ());
 		}
-		return new Point3D((minx + maxx) / 2, (miny + maxy) / 2,
-				(minz + maxz) / 2);
+		return new Point3D((minx + maxx) / 2, (miny + maxy) / 2, (minz + maxz) / 2);
 	}
 
 	@Override

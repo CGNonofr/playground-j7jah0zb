@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.geom.Point2D;
+import java.util.function.Supplier;
 
 import model.Point3D;
 import model.Ray;
@@ -13,6 +14,19 @@ import model.camera.Camera;
 import model.octree.AABB;
 
 public class Triangle implements Entity3D {
+	private static ThreadLocal<Vector> tmpVectorFactory = ThreadLocal.withInitial(new Supplier<Vector>() {
+		@Override
+		public Vector get() {
+			return new Vector(0, 0, 0);
+		}
+	});
+	private static ThreadLocal<Point3D> tmpPointFactory = ThreadLocal.withInitial(new Supplier<Point3D>() {
+		@Override
+		public Point3D get() {
+			return new Point3D(0, 0, 0);
+		}
+	});
+	
 	private Vertex p1, p2, p3;
 	public static final float SMALL_NUM = 0.00000001f;
 
@@ -21,7 +35,7 @@ public class Triangle implements Entity3D {
 		this.p1 = p1;
 		this.p2 = p2;
 		this.p3 = p3;
-		normal=(u=new Vector(p1.getPoint(), p2.getPoint())).cross((v=new Vector(p1.getPoint(), p3.getPoint()))).normalize();
+		normal=(u=new Vector(p1.getPoint(), p2.getPoint())).clone().cross((v=new Vector(p1.getPoint(), p3.getPoint()))).normalize();
 	}
 
 
@@ -30,8 +44,11 @@ public class Triangle implements Entity3D {
 		if (normal.length() == 0) {
 			return null;
 		}
+		
+		Vector tmpVector = tmpVectorFactory.get();
+		Point3D tmpPoint = tmpPointFactory.get();
 
-		Vector w = new Vector(p1.getPoint(), ray.getOrigin());
+		Vector w = tmpVector.set(p1.getPoint(), ray.getOrigin());
 
 		double a = -normal.dot(w);
 		double b = normal.dot(ray.getDirection());
@@ -44,13 +61,15 @@ public class Triangle implements Entity3D {
 		if (r < 0d) {
 			return null;
 		}
+		
+		
 
-		Point3D pt = ray.getOrigin().translate(ray.getDirection().mult(r));
+		Point3D pt = tmpPoint.set(ray.getOrigin()).translate(tmpVector.set(ray.getDirection()).mult(r));
 		double uu = u.dot(u);
 		double uv = u.dot(v);
 		double vv = v.dot(v);
 
-		w = new Vector(p1.getPoint(), pt);
+		w = tmpVector.set(p1.getPoint(), pt);
 
 		double wu = w.dot(u);
 		double wv = w.dot(v);
@@ -66,14 +85,14 @@ public class Triangle implements Entity3D {
 		}
 		
 		TextureCoordinates texture=null;
-		if(p1.getTexture()!=null && p2.getTexture()!=null && p3.getTexture()!=null) {
-			texture=new TextureCoordinates((p1.getTexture().getX()*(1-s)+p2.getTexture().getX()*s)*(1-t)+p3.getTexture().getX()*t,(p1.getTexture().getY()*(1-s)+p2.getTexture().getY()*s)*(1-t)+p3.getTexture().getY()*t);
+		if(p1.getTexture() != null && p2.getTexture() != null && p3.getTexture() != null) {
+			texture = new TextureCoordinates((p1.getTexture().getX()*(1-s)+p2.getTexture().getX()*s)*(1-t)+p3.getTexture().getX()*t,(p1.getTexture().getY()*(1-s)+p2.getTexture().getY()*s)*(1-t)+p3.getTexture().getY()*t);
 		}
 		Vector normal=null;
-		if(p1.getNormal()!=null && p2.getNormal()!=null && p3.getNormal()!=null) {
-			normal=new Vector((p1.getNormal().getX()*(1-s)+p2.getNormal().getX()*s)*(1-t)+p3.getNormal().getX()*t,(p1.getNormal().getY()*(1-s)+p2.getNormal().getY()*s)*(1-t)+p3.getNormal().getY()*t,(p1.getNormal().getZ()*(1-s)+p2.getNormal().getZ()*s)*(1-t)+p3.getNormal().getZ()*t);
+		if(p1.getNormal() != null && p2.getNormal() != null && p3.getNormal() != null) {
+			normal = new Vector((p1.getNormal().getX()*(1-s)+p2.getNormal().getX()*s)*(1-t)+p3.getNormal().getX()*t,(p1.getNormal().getY()*(1-s)+p2.getNormal().getY()*s)*(1-t)+p3.getNormal().getY()*t,(p1.getNormal().getZ()*(1-s)+p2.getNormal().getZ()*s)*(1-t)+p3.getNormal().getZ()*t);
 		} else {
-			normal=this.normal;
+			normal = this.normal;
 		}
 		return new RayCollision(r, pt, normal, texture, 0, 0.5);
 	}

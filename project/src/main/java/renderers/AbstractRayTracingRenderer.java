@@ -9,7 +9,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import model.Point3D;
 import model.Ray;
+import model.Vector;
 import model.camera.Camera;
 import renderers.destination.RenderDestination;
 
@@ -18,8 +20,9 @@ public abstract class AbstractRayTracingRenderer implements Renderer {
 	public int[] render(int line, final Camera c) throws IOException {
 		int width = c.getResolution().width;
 		int[] colors = new int[width];
+		Ray ray = new Ray(new Point3D(0, 0, 0), new Vector(0, 0, 0));
 		for (int x = 0; x < width; ++x) {
-			Ray ray = c.getRay(x, line);
+			c.getRay(x, line, ray);
 			colors[x] = throwRay(ray, 5);
 		}
 		System.gc();
@@ -43,7 +46,7 @@ public abstract class AbstractRayTracingRenderer implements Renderer {
 	@Override
 	public void render(final Camera c, RenderDestination render) {
 		long start = System.currentTimeMillis();
-		ExecutorService executor = Executors.newWorkStealingPool(1);
+		ExecutorService executor = Executors.newWorkStealingPool();
 
 		
 		BlockingQueue<Future<int[]>> results = new LinkedBlockingQueue<>();

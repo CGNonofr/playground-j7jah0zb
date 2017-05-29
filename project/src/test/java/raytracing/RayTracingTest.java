@@ -40,7 +40,7 @@ public class RayTracingTest {
 		final Object3D obj = new ObjFileLoader().load(url);
 		double cameraDistance = Math.max(Math.max(obj.getBoundingBox().getWidth(), obj.getBoundingBox().getHeight()),
 				obj.getBoundingBox().getDepth()) * distance;
-		final CenteredCamera c = new CenteredCamera(obj.getBoundingBox().center().translate(translate),
+		final CenteredCamera c = new CenteredCamera(obj.getBoundingBox().center().clone().translate(translate),
 				cameraDistance, cameraDirection, cameraNormal, 1, width / (double) height, 1,
 				new Dimension(width, height));
 		Scene sce = new Scene();
@@ -111,11 +111,11 @@ public class RayTracingTest {
 		System.out.println("end gc");
 	}
 
-//	@Test
-//	public void testMiniCooper() throws IOException {
-//		test(new Dimension(700, 400), new Vector(1, 1, -1).normalize(), new Vector(0, 0, 1).normalize(), new Vector(20, -10, -25), 1,
-//				RayTracingTest.class.getResource("/minicooper.obj"));
-//	}
+	@Test
+	public void testMiniCooper() throws IOException {
+		test(new Dimension(700, 400), new Vector(1, 1, -1).normalize(), new Vector(0, 0, 1).normalize(), new Vector(20, -10, -25), 1,
+				RayTracingTest.class.getResource("/minicooper.obj"));
+	}
 
 	@Test
 	public void testTeapot() throws IOException {

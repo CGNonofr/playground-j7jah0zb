@@ -32,7 +32,7 @@ public class GMain {
 		final Object3D obj=new ObjFileLoader().load(new File("/home/lolo/Bureau/minicooper.obj").toURI().toURL());
 //		final Camera c=new FixedCamera(new Vertex(0, 0.5, 500), new Vector(0, 0, -1), 1, 1, 1, new Dimension(800, 600));
 		double cameraDistance = Math.max(Math.max(obj.getBoundingBox().getWidth(), obj.getBoundingBox().getHeight()), obj.getBoundingBox().getDepth());
-		final CenteredCamera c=new CenteredCamera(obj.getBoundingBox().center().translate(new Vector(0, 0, -20)), cameraDistance, new Vector(1, 1, -1), new Vector(0, 0, 1).normalize(), 1, 1400d/900d, 1, new Dimension(1000, 700));
+		final CenteredCamera c=new CenteredCamera(obj.getBoundingBox().center().clone().translate(new Vector(0, 0, -20)), cameraDistance, new Vector(1, 1, -1), new Vector(0, 0, 1).normalize(), 1, 1400d/900d, 1, new Dimension(1000, 700));
 
 		final BufferedImage image = new BufferedImage(c.getResolution().width, c.getResolution().height, BufferedImage.TYPE_INT_RGB);
 		

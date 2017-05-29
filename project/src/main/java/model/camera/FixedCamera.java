@@ -19,24 +19,24 @@ public class FixedCamera extends Camera {
 	}
 	
 	public void up() {
-		this.direction=this.direction.add(new Vector(0, 0.001, 0)).normalize();
+		this.direction.sum(new Vector(0, 0.001, 0)).normalize();
 		super.update();
 	}
 	public void down() {
-		this.direction=this.direction.add(new Vector(0, -0.001, 0)).normalize();
+		this.direction.sum(new Vector(0, -0.001, 0)).normalize();
 		super.update();
 	}
 	
 	public void translate(Vector v) {
-		origin=origin.translate(v);
+		origin.translate(v);
 		super.update();
 	}
 	
 	public Vector screenH() {
-		return direction.cross(new Vector(0, 1, 0)).normalize();
+		return direction.clone().cross(new Vector(0, 1, 0)).normalize();
 	}
 	public Vector screenV() {
-		return direction.cross(screenH()).normalize();
+		return direction.clone().cross(screenH()).normalize();
 	}
 
 

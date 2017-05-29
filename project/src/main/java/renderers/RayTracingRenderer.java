@@ -1,6 +1,7 @@
 package renderers;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 import model.Ray;
 import model.Vector;
@@ -36,7 +37,8 @@ public class RayTracingRenderer extends AbstractRayTracingRenderer {
 		BufferedImage texture = null;
 		for (int i = 0; i < trees.length; ++i) {
 			OcTree tree = trees[i];
-			for (Entity3D f : tree.getIntersectable(ray)) {
+			List<Entity3D> intersectables = tree.getIntersectable(ray);
+			for (Entity3D f : intersectables) {
 				RayCollision temp = f.intersect(ray);
 				if (temp != null) {
 					double distance = temp.getHitDistance();
@@ -59,8 +61,8 @@ public class RayTracingRenderer extends AbstractRayTracingRenderer {
 			}
 
 			if (collision.getTransparence() > 0) {
-				Ray newRay = new Ray(collision.getPoint().translate(
-						ray.getDirection().mult(0.0001)), ray.getDirection());
+				Ray newRay = new Ray(collision.getPoint().clone().translate(
+						ray.getDirection().clone().mult(0.0001)), ray.getDirection());
 				Integer c = throwRay(newRay, depth - 1);
 				if (c != null) {
 					col = MixColor.mixColor(col, c,
@@ -68,9 +70,8 @@ public class RayTracingRenderer extends AbstractRayTracingRenderer {
 				}
 			}
 			if (collision.getReflection() > 0) {
-				Vector newDir = collision.getNormal().reflect(
-						ray.getDirection());
-				Ray newRay = new Ray(collision.getPoint().translate(
+				Vector newDir = collision.getNormal().clone().reflect(ray.getDirection());
+				Ray newRay = new Ray(collision.getPoint().clone().translate(
 						newDir.mult(0.0001)), newDir);
 				Integer c = throwRay(newRay, depth - 1);
 				if (c != null) {

@@ -23,8 +23,8 @@ public class Sphere implements Entity3D {
 
 	@Override
 	public RayCollision intersect(Ray r) {
-		double angleVersCentre=r.getDirection().normalize().dot(new Vector(r.getOrigin(),center));
-		Point3D proj=r.getOrigin().translate(r.getDirection().normalize().mult(angleVersCentre));
+		double angleVersCentre = r.getDirection().clone().normalize().dot(new Vector(r.getOrigin(), center));
+		Point3D proj=r.getOrigin().clone().translate(r.getDirection().clone().normalize().mult(angleVersCentre));
 		double ratio=center.distance(proj)/radius;
 		
 		if(ratio<1)  {
@@ -32,9 +32,9 @@ public class Sphere implements Entity3D {
 			Point3D contact = null;
 			double distanceCentre=r.getOrigin().distance(center);
 			if(angleVersCentre>0 && distanceCentre > radius) { // si on est a l'exterieur et qu'on regarde vers la sphere			
-				contact=proj.translate(r.getDirection().normalize().mult(-sin*radius));
+				contact=proj.clone().translate(r.getDirection().normalize().mult(-sin*radius));
 			} else if((angleVersCentre>0 && distanceCentre <= radius) || (angleVersCentre>0 && distanceCentre <= radius)) { // si on est a l'interieur
-				contact=proj.translate(r.getDirection().normalize().mult(sin*radius));
+				contact=proj.clone().translate(r.getDirection().normalize().mult(sin*radius));
 			} else return null;	
 			
 			Vector normal=new Vector(center,contact).normalize();
