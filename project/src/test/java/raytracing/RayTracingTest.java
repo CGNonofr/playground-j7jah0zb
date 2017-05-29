@@ -113,9 +113,9 @@ public class RayTracingTest {
 				RayTracingTest.class.getResource("/minicooper.obj"));
 	}
 
-//	@Test
-//	public void testTeapot() throws Exception {
-//		test(new Dimension(1920, 1080), new Vector(-1, -1, -1).normalize(), new Vector(0, 1, 0).normalize(), new Vector(40, 20, 15), 0.5,
-//				RayTracingTest.class.getResource("/teapot.obj"));
-//	}
+	@Test
+	public void testTeapot() throws Exception {
+		test(new Dimension(1920, 1080), new Vector(-1, -1, -1).normalize(), new Vector(0, 1, 0).normalize(), new Vector(40, 20, 15), 0.5,
+				RayTracingTest.class.getResource("/teapot.obj"));
+	}
 }
