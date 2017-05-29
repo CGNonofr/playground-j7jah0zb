@@ -109,7 +109,7 @@ public class RayTracingTest {
 
 	@Test
 	public void testMiniCooper() throws Exception {
-		test(new Dimension(1920, 1080), new Vector(1, 1, -1).normalize(), new Vector(0, 0, 1).normalize(), new Vector(20, -10, -25), 1,
+		test(new Dimension(1280, 720), new Vector(1, 1, -1).normalize(), new Vector(0, 0, 1).normalize(), new Vector(20, -10, -25), 1,
 				RayTracingTest.class.getResource("/minicooper.obj"));
 	}
 

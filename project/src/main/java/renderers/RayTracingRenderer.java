@@ -69,16 +69,16 @@ public class RayTracingRenderer extends AbstractRayTracingRenderer {
 							1 - collision.getTransparence());
 				}
 			}
-			if (collision.getReflection() > 0) {
-				Vector newDir = collision.getNormal().clone().reflect(ray.getDirection());
-				Ray newRay = new Ray(collision.getPoint().clone().translate(
-						newDir.mult(0.0001)), newDir);
-				Integer c = throwRay(newRay, depth - 1);
-				if (c != null) {
-					col = MixColor.mixColor(col, c,
-							1 - collision.getReflection());
-				}
-			}
+//			if (collision.getReflection() > 0) {
+//				Vector newDir = collision.getNormal().clone().reflect(ray.getDirection());
+//				Ray newRay = new Ray(collision.getPoint().clone().translate(
+//						newDir.mult(0.0001)), newDir);
+//				Integer c = throwRay(newRay, depth - 1);
+//				if (c != null) {
+//					col = MixColor.mixColor(col, c,
+//							1 - collision.getReflection());
+//				}
+//			}
 			return col;
 		} else {
 			return (220<<16) + (220 << 8) + 255;
