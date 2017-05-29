@@ -61,7 +61,7 @@ public class RayTracingTest {
 					ex.sendResponseHeaders(200, bytes.length);
 					OutputStream os = ex.getResponseBody();
 					os.write(bytes);
-					os.close();
+					os.flush();
 					ex.close();
 				} catch (URISyntaxException e) {
 					// TODO Auto-generated catch block
