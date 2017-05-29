@@ -58,7 +58,7 @@ public class RayTracingTest {
 					String answer = new String(Files.readAllBytes(Paths.get(RayTracingTest.class.getResource("/index.html").toURI())));
 
 					byte[] bytes = answer.getBytes();
-					ex.sendResponseHeaders(200, bytes.length);
+					ex.sendResponseHeaders(200, 0);
 					OutputStream os = ex.getResponseBody();
 					os.write(bytes);
 					os.flush();
