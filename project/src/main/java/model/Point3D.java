@@ -41,7 +41,6 @@ public class Point3D {
 	}
 	
 	public Point3D clone() {
-		newInstance();
 		return new Point3D(x, y, z);
 	}
 	
@@ -53,17 +52,17 @@ public class Point3D {
 		return new Vector(this, v).length();
 	}
 	
-	private static int counter = 0;
-	private static Map<StackTraceElement, Integer> stacks;
-	public static void newInstance() {
-		if (stacks == null) {
-			stacks = new HashMap<>();
-		}
-		StackTraceElement stack = Thread.currentThread().getStackTrace()[3];
-		stacks.put(stack, stacks.getOrDefault(stack, 0) + 1);
-		counter ++;
-		if (counter % 100000 == 0) {
-			System.out.println(counter+" "+stacks);
-		}
-	}
+//	private static int counter = 0;
+//	private static Map<StackTraceElement, Integer> stacks;
+//	public static void newInstance() {
+//		if (stacks == null) {
+//			stacks = new HashMap<>();
+//		}
+//		StackTraceElement stack = Thread.currentThread().getStackTrace()[3];
+//		stacks.put(stack, stacks.getOrDefault(stack, 0) + 1);
+//		counter ++;
+//		if (counter % 100000 == 0) {
+//			System.out.println(counter+" "+stacks);
+//		}
+//	}
 }

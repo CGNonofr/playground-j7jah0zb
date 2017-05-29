@@ -57,10 +57,12 @@ public class RayTracingTest {
 				try {
 					String answer = new String(Files.readAllBytes(Paths.get(RayTracingTest.class.getResource("/index.html").toURI())));
 
-					ex.sendResponseHeaders(200, answer.length());
+					byte[] bytes = answer.getBytes();
+					ex.sendResponseHeaders(200, bytes.length);
 					OutputStream os = ex.getResponseBody();
-					os.write(answer.getBytes());
+					os.write(bytes);
 					os.close();
+					ex.close();
 				} catch (URISyntaxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
